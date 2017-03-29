@@ -31,13 +31,15 @@ RUN cd /usr/local/src && \
     make -f build-aux/speedo.mk native INSTALL_PREFIX="/usr/local/"
 
 RUN cd /usr/local/src && \
+    LD_LIBRARY_PATH="/usr/local/lib/:${LD_LIBRARY_PATH}" && \
+    export LD_LIBRARY_PATH && \
     curl -LO https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.0.0.tar.bz2 && \
     curl -LO https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.0.0.tar.bz2.sig && \
     export GNUPGHOME="$(mktemp -d)" && \
-    gpg2 --recv-keys 4F25E3B && \
+    gpg2 --keyserver hkps.pool.sks-keyservers.net --recv-keys 4F25E3B6 && \
     gpg2 --verify pinentry-1.0.0.tar.bz2.sig pinentry-1.0.0.tar.bz2 && \
     tar -xvf pinentry-1.0.0.tar.bz2 && cd pinentry-1.0.0 && \
-    ./configure && make && make install
+    ./configure --enable-pinentry-tty && make && make install
     
  
 ENV PATH="/usr/local/src/kubernetes/client/bin/:$PATH" \
